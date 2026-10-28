@@ -13,6 +13,11 @@ class Transaction extends Model
         'userid', 'accountid', 'categoryid', 'amount', 'description', 'type', 'transaction_date'
     ];
 
+    // add dates
+    protected $dates = [
+        'transaction_date',
+    ];
+
     protected $casts = [
         'transaction_date' => 'date',
     ];

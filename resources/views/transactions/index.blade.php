@@ -1,102 +1,163 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Daftar Transaksi</title>
-    <style>
-        body { font-family: sans-serif; padding: 24px; color: #333; }
-        .filter-box { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
-        select, input, button { padding: 8px 12px; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        .stat-card { border: 1px solid #d1d5db; background-color: #f9fafb; border-radius: 8px; padding: 16px; width: 350px; margin-top: 24px; }
-        .stat-card p { margin: 8px 0; }
-        .empty-row { text-align: center; color: #dc2626; font-weight: bold; }
-        .btn { display: inline-block; padding: 6px 12px; font-size: 13px; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
-        .btn-primary { background-color: #2563eb; color: #fff; }
-        .btn-warning { background-color: #f59e0b; color: #fff; }
-        .btn-danger { background-color: #dc2626; color: #fff; }
-        .float-end { float: right; }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-    <div style="margin-bottom: 20px;">
-        <!-- Tombol Create Transaksi -->
-        <a href="{{ route('transactions.create') }}" class="btn btn-primary float-end">Tambah Transaksi</a>
-        <h2 style="margin: 0;">Daftar Transaksi</h2>
+@section('title', 'Daftar Transaksi - FinTrack')
+
+@section('content')
+<div class="row g-4">
+    <!-- Header Title & Action Button -->
+    <div class="col-12">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h3 class="fw-bold mb-1"><i class="bi bi-wallet2 text-primary me-2"></i>Daftar Transaksi Keuangan</h3>
+                <p class="text-muted small mb-0">Kelola dan pantau seluruh catatan arus kas transaksi masuk dan keluar</p>
+            </div>
+            <div>
+                @if(Auth::check() && Auth::user()->role === 'admin')
+                    <a href="{{ route('transactions.create') }}" class="btn btn-primary shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Transaksi
+                    </a>
+                @else
+                    <span class="badge bg-secondary-subtle text-secondary p-2 border">
+                        <i class="bi bi-eye me-1"></i> Mode View (User Biasa - Tambah/Ubah khusus Admin)
+                    </span>
+                @endif
+            </div>
+        </div>
     </div>
 
-    <!-- Form Search & Dropdown Kategori -->
-    <form action="{{ route('transactions.index') }}" method="GET" class="filter-box">
-        <!-- Dropdown Kategori -->
-        <select name="category_id" onchange="this.form.submit()">
-            <option value="semua">Semua Kategori</option>
-            @foreach($categories as $category)
-                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                    {{ $category->name }}
-                </option>
-            @endforeach
-        </select>
-
-        <!-- Input Pencarian Deskripsi & Tombol Cari -->
-        <input type="text" name="cari" placeholder="Cari deskripsi..." value="{{ request('cari') }}">
-        <button type="submit">Cari</button>
-        <a href="{{ route('transactions.index') }}">Reset</a>
-    </form>
-
-    <!-- Tabel Data Transaksi -->
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Tanggal</th>
-                <th>Kategori</th>
-                <th>Deskripsi</th>
-                <th>Tipe</th>
-                <th>Nominal</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($transactions as $index => $trx)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $trx->transaction_date ? $trx->transaction_date->format('d/m/Y') : '-' }}</td>
-                    <td>{{ $trx->category->name ?? '-' }}</td>
-                    <td>{{ $trx->description }}</td>
-                    <td>{{ $trx->type }}</td>
-                    <td>{{ "Rp " . number_format($trx->amount, 2, ',', '.') }}</td>
-                    <td style="white-space: nowrap;">
-                        <!-- Tombol Update (Edit) -->
-                        <a href="{{ route('transactions.edit', $trx->id) }}" class="btn btn-warning">Edit</a>
-
-                        <!-- Tombol Delete -->
-                        <form action="{{ route('transactions.destroy', $trx->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button onclick="return confirm('Yakin mau dihapus?')" type="submit" class="btn btn-danger">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <!-- Pesan data tidak ditemukan -->
-                <tr>
-                    <td colspan="7" class="empty-row">Data transaksi tidak ditemukan.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-
-    <!-- Kotak Statistik Transaksi -->
-    <div class="stat-card">
-        <h3>Statistik Transaksi</h3>
-        <p><strong>Total Transaksi:</strong> {{ $total_transaksi }}</p>
-        <p><strong>Total Nominal Semua Transaksi:</strong> {{ "Rp " . number_format($total_nominal, 2, ',', '.') }}</p>
-        <p><strong>Transaksi Nominal Tertinggi:</strong> {{ "Rp " . number_format($nominal_tertinggi, 2, ',', '.') }}</p>
-        <p><strong>Transaksi Nominal Terendah:</strong> {{ "Rp " . number_format($nominal_terendah, 2, ',', '.') }}</p>
+    <!-- Filter Form Kategori & Search -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-3">
+                <form action="{{ route('transactions.search') }}" method="GET" class="row g-2 align-items-center">
+                    <div class="col-md-4">
+                        <select name="category_id" class="form-select" onchange="this.form.submit()">
+                            <option value="semua">Semua Kategori</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }} ({{ ucfirst($category->type) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" name="kata" class="form-control" placeholder="Cari deskripsi transaksi..." value="{{ request('kata') ?? request('cari') }}">
+                            <button type="submit" class="btn btn-primary px-3">Cari</button>
+                        </div>
+                    </div>
+                    <div class="col-md-2 text-md-end">
+                        <a href="{{ route('transactions.index') }}" class="btn btn-outline-secondary w-100">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
-</body>
-</html>
+    <!-- Tabel Transaksi -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 60px;">No</th>
+                                <th>Tanggal</th>
+                                <th>Kategori</th>
+                                <th>Deskripsi</th>
+                                <th>Tipe</th>
+                                <th class="text-end">Nominal</th>
+                                @if(Auth::check() && Auth::user()->role === 'admin')
+                                    <th class="text-center" style="width: 160px;">Aksi (Admin)</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($transactions as $trx)
+                                <tr>
+                                    <td>{{ ++$no }}</td>
+                                    <td>{{ $trx->transaction_date ? $trx->transaction_date->format('d/m/Y') : '-' }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary-subtle text-secondary border">
+                                            {{ $trx->category->name ?? '-' }}
+                                        </span>
+                                    </td>
+                                    <td class="fw-semibold">{{ $trx->description }}</td>
+                                    <td>
+                                        <span class="badge {{ $trx->type == 'income' ? 'bg-success' : 'bg-warning text-dark' }}">
+                                            {{ ucfirst($trx->type) }}
+                                        </span>
+                                    </td>
+                                    <td class="text-end fw-bold {{ $trx->type == 'income' ? 'text-success' : 'text-danger' }}">
+                                        {{ "Rp " . number_format($trx->amount, 2, ',', '.') }}
+                                    </td>
+                                    @if(Auth::check() && Auth::user()->role === 'admin')
+                                        <td class="text-center">
+                                            <a href="{{ route('transactions.edit', $trx->id) }}" class="btn btn-warning btn-sm me-1" title="Edit Transaksi">
+                                                <i class="bi bi-pencil-square"></i> Edit
+                                            </a>
+                                            <form action="{{ route('transactions.destroy', $trx->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button onclick="return confirm('Yakin ingin menghapus transaksi ini?')" type="submit" class="btn btn-danger btn-sm" title="Hapus Transaksi">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        </td>
+                                    @endif
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="{{ (Auth::check() && Auth::user()->role === 'admin') ? 7 : 6 }}" class="text-center py-4 text-danger fw-semibold">
+                                        Data transaksi tidak ditemukan.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+                <div class="small text-muted mb-2 mb-md-0">
+                    <div><strong>Jumlah Transaksi: {{ $total_transaksi }}</strong></div>
+                    <span>Menampilkan {{ $transactions->count() }} dari {{ $total_transaksi }} total transaksi</span>
+                </div>
+                <div>
+                    {{ $transactions->links() }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistik Transaksi -->
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-bar-chart-fill me-2 text-primary"></i>Statistik Transaksi</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Total Jumlah Transaksi:</span>
+                        <span class="fw-bold">{{ $total_transaksi }} transaksi</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Total Nominal Semua Transaksi:</span>
+                        <span class="fw-bold text-success">{{ "Rp " . number_format($total_nominal, 2, ',', '.') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Transaksi Nominal Tertinggi:</span>
+                        <span class="fw-bold text-primary">{{ "Rp " . number_format($nominal_tertinggi, 2, ',', '.') }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Transaksi Nominal Terendah:</span>
+                        <span class="fw-bold text-secondary">{{ "Rp " . number_format($nominal_terendah, 2, ',', '.') }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection

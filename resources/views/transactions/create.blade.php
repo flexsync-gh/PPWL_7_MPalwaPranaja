@@ -1,74 +1,137 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Transaksi</title>
-    <style>
-        body { font-family: sans-serif; padding: 24px; color: #333; }
-        .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-        h4 { margin-top: 0; font-size: 20px; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group select { width: 100%; padding: 8px 12px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        .btn { display: inline-block; padding: 8px 16px; font-size: 14px; text-decoration: none; border-radius: 4px; border: none; cursor: pointer; }
-        .btn-primary { background-color: #2563eb; color: #fff; }
-        .btn-secondary { background-color: #6b7280; color: #fff; margin-left: 8px; }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="container">
-    <h4>Tambah Transaksi</h4>
-    <form method="post" action="{{ route('transactions.store') }}">
-        @csrf
-        <div class="form-group">
-            <label>Tanggal Transaksi</label>
-            <input type="date" name="transaction_date" required>
-        </div>
+@section('title', 'Tambah Transaksi - FinTrack')
 
-        <div class="form-group">
-            <label>Kategori</label>
-            <select name="categoryid" required>
-                <option value="">-- Pilih Kategori --</option>
-                @foreach($categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }} ({{ $category->type }})</option>
-                @endforeach
-            </select>
-        </div>
+@section('styles')
+<!-- datepicker css -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+@endsection
 
-        <div class="form-group">
-            <label>Akun</label>
-            <select name="accountid" required>
-                @foreach($accounts as $account)
-                    <option value="{{ $account->id }}">{{ $account->name }}</option>
-                @endforeach
-            </select>
-        </div>
+@section('content')
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-plus-circle-fill text-primary me-2"></i>Tambah Transaksi</h5>
+                <span class="badge bg-danger text-uppercase">Role: Admin Only</span>
+            </div>
+            <div class="card-body p-4">
 
-        <div class="form-group">
-            <label>Tipe</label>
-            <select name="type" required>
-                <option value="Expense">Expense (Pengeluaran)</option>
-                <option value="Income">Income (Pemasukan)</option>
-            </select>
-        </div>
+                @if ($errors->any())
+                    <div class="alert alert-danger py-2 small mb-4">
+                        <ul class="mb-0 ps-3">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-        <div class="form-group">
-            <label>Nominal (Rp)</label>
-            <input type="number" step="any" name="amount" placeholder="Contoh: 50000" required>
-        </div>
+                <form method="POST" action="{{ route('transactions.store') }}">
+                    @csrf
 
-        <div class="form-group">
-            <label>Deskripsi</label>
-            <input type="text" name="description" placeholder="Deskripsi transaksi..." required>
-        </div>
+                    <div class="mb-3">
+                        <label for="transaction_date" class="form-label fw-semibold">Tanggal Transaksi</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                            <input 
+                                type="text" 
+                                id="transaction_date" 
+                                name="transaction_date" 
+                                class="date form-control @error('transaction_date') is-invalid @enderror" 
+                                placeholder="yyyy-mm-dd" 
+                                value="{{ old('transaction_date', date('Y-m-d')) }}" 
+                                required
+                            >
+                        </div>
+                    </div>
 
-        <div style="margin-top: 20px;">
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ '/transactions' }}" class="btn btn-secondary">Kembali</a>
+                    <div class="mb-3">
+                        <label for="categoryid" class="form-label fw-semibold">Kategori</label>
+                        <select name="categoryid" id="categoryid" class="form-select @error('categoryid') is-invalid @enderror" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ old('categoryid') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }} ({{ ucfirst($category->type) }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="accountid" class="form-label fw-semibold">Akun Keuangan</label>
+                        <select name="accountid" id="accountid" class="form-select @error('accountid') is-invalid @enderror" required>
+                            <option value="">-- Pilih Akun --</option>
+                            @foreach($accounts as $account)
+                                <option value="{{ $account->id }}" {{ old('accountid') == $account->id ? 'selected' : '' }}>
+                                    {{ $account->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="type" class="form-label fw-semibold">Tipe Transaksi</label>
+                        <select name="type" id="type" class="form-select @error('type') is-invalid @enderror" required>
+                            <option value="Expense" {{ old('type') == 'Expense' ? 'selected' : '' }}>Expense (Pengeluaran)</option>
+                            <option value="Income" {{ old('type') == 'Income' ? 'selected' : '' }}>Income (Pemasukan)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="amount" class="form-label fw-semibold">Nominal (Rp)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp</span>
+                            <input 
+                                type="number" 
+                                step="any" 
+                                id="amount" 
+                                name="amount" 
+                                class="form-control @error('amount') is-invalid @enderror" 
+                                placeholder="Contoh: 50000" 
+                                value="{{ old('amount') }}" 
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-semibold">Deskripsi / Catatan</label>
+                        <textarea 
+                            id="description" 
+                            name="description" 
+                            class="form-control @error('description') is-invalid @enderror" 
+                            rows="3" 
+                            placeholder="Deskripsi transaksi..." 
+                            required
+                        >{{ old('description') }}</textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ route('transactions.index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Batal / Kembali
+                        </a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="bi bi-save me-1"></i> Simpan Transaksi
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
+@endsection
 
-</body>
-</html>
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.date').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
+        });
+    });
+</script>
+@endsection
