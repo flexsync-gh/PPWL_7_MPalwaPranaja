@@ -120,10 +120,15 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td class="fw-semibold">
-                                        {{ $u->name }}
-                                        @if($u->id === Auth::id())
-                                            <span class="badge bg-secondary-subtle text-secondary ms-1">Akun Anda</span>
-                                        @endif
+                                        <div class="d-flex align-items-center gap-2">
+                                            <x-user-avatar :user="$u" :size="32" :fontSize="13" />
+                                            <div>
+                                                {{ $u->name }}
+                                                @if($u->id === Auth::id())
+                                                    <span class="badge bg-secondary-subtle text-secondary ms-1">Akun Anda</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>{{ $u->email }}</td>
                                     <td>{{ $u->phonenumber ?? '-' }}</td>

@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -30,14 +29,5 @@ class DashboardController extends Controller
             'total_kategori',
             'recent_transactions'
         ));
-    }
-
-    /**
-     * Tampilkan halaman Profile (Latihan 1 MIDDLEWARE_RBAC.pdf).
-     */
-    public function profile()
-    {
-        $user = Auth::user();
-        return view('profile', compact('user'));
     }
 }

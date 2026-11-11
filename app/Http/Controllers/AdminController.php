@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Transaction;
-use App\Models\Category;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    /**
-     * Tampilkan halaman Admin Dashboard (Step 6 & Latihan 2 MIDDLEWARE_RBAC.pdf).
-     */
+    // Tampilkan halaman Admin Dashboard.
     public function index()
     {
         $users = User::orderBy('id', 'desc')->get();
@@ -37,9 +34,7 @@ class AdminController extends Controller
         ));
     }
 
-    /**
-     * Mengubah role user (Fitur pembantu untuk mempermudah pengujian RBAC).
-     */
+    // Mengubah role user
     public function updateRole(Request $request, $id)
     {
         $request->validate([
@@ -48,7 +43,7 @@ class AdminController extends Controller
 
         $user = User::findOrFail($id);
 
-        // Mencegah admin mengubah role diri sendiri menjadi user jika sedang login
+        // Mencegah admin mengubah role diri sendiri
         if ($user->id === Auth::id() && $request->role !== 'admin') {
             return back()->with('error', 'Anda tidak dapat menurunkan role akun admin Anda sendiri saat sedang login.');
         }

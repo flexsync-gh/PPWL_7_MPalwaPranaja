@@ -9,14 +9,17 @@
         <div class="card bg-primary text-white border-0 shadow-sm">
             <div class="card-body p-4 p-md-5">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-                    <div>
-                        <span class="badge bg-light text-primary fw-bold text-uppercase px-3 py-1 mb-2">
-                            Role: {{ $user->role }}
-                        </span>
-                        <h2 class="fw-bold mb-1">Selamat Datang, {{ $user->name }}! 👋</h2>
-                        <p class="mb-0 opacity-75">
-                            Anda berhasil masuk ke sistem catatan keuangan FinTrack. Halaman ini diproteksi oleh <code>middleware('auth')</code>.
-                        </p>
+                    <div class="d-flex align-items-center gap-3">
+                        <x-user-avatar :user="$user" :size="64" class="border border-2 border-white" />
+                        <div>
+                            <span class="badge bg-light text-primary fw-bold text-uppercase px-3 py-1 mb-2">
+                                Role: {{ $user->role }}
+                            </span>
+                            <h2 class="fw-bold mb-1">Selamat Datang, {{ $user->name }}! 👋</h2>
+                            <p class="mb-0 opacity-75">
+                                Anda berhasil masuk ke sistem catatan keuangan FinTrack. Halaman ini diproteksi oleh <code>middleware('auth')</code>.
+                            </p>
+                        </div>
                     </div>
                     <div class="d-flex gap-2">
                         <a href="{{ route('profile') }}" class="btn btn-light btn-sm px-3 fw-semibold text-primary">

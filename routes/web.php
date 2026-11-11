@@ -1,10 +1,11 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,9 +13,9 @@ use App\Http\Controllers\TransactionController;
 |--------------------------------------------------------------------------
 */
 
-// 1. Route Sederhana (Step 1 MIDDLEWARE_RBAC.pdf)
+// 1. Route Sederhana
 Route::get('/hello', function () {
-    return "Halo, ini halaman percobaan route!";
+    return 'Halo, ini halaman percobaan route!';
 });
 
 // Halaman Utama / Landing Page
@@ -22,7 +23,7 @@ Route::get('/', function () {
     return view('welcome');
 })->name('welcome');
 
-// 2. Route Autentikasi Pengunjung (AUTH_2.pdf)
+// 2. Route Autentikasi Pengunjung (Middleware Guest)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -30,7 +31,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
 });
 
-// 3. Route yang Memerlukan Login (Middleware 'auth' - Step 3 & Latihan 1 MIDDLEWARE_RBAC.pdf)
+// 3. Route yang Memerlukan Login (Middleware auth)
 Route::middleware('auth')->group(function () {
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -38,13 +39,15 @@ Route::middleware('auth')->group(function () {
     // Dashboard & Profile
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
-    Route::get('/profile', [DashboardController::class, 'profile'])->name('profile');
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])->name('profile.photo.destroy');
 
     // Menampilkan & Pencarian Transaksi (Bisa diakses User & Admin)
     Route::get('/transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('/transactions/search', [TransactionController::class, 'search'])->name('transactions.search');
 
-    // 4. Route Khusus Admin (Middleware 'isAdmin' - Step 6 & Latihan 2 MIDDLEWARE_RBAC.pdf)
     Route::middleware('isAdmin')->group(function () {
         // Halaman Admin Dashboard
         Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');

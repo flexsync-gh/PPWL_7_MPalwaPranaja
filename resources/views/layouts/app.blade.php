@@ -96,8 +96,9 @@
                             </span>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                <i class="bi bi-person-circle me-1"></i> {{ Auth::user()->name }}
+                            <a class="nav-link dropdown-toggle text-light d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                <x-user-avatar :user="Auth::user()" :size="28" :fontSize="12" />
+                                <span>{{ Auth::user()->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow">
                                 <li>
