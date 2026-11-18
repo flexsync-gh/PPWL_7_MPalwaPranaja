@@ -42,6 +42,8 @@
             margin-top: auto;
         }
     </style>
+    <!-- Lightbox2 CSS -->
+    <link rel="stylesheet" href="{{ asset('lightbox2/dist/css/lightbox.min.css') }}">
     @yield('styles')
 </head>
 <body>
@@ -68,6 +70,11 @@
                                 <i class="bi bi-wallet2 me-1"></i> Transaksi
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('gallery.*') ? 'active fw-bold' : '' }}" href="{{ route('gallery.index') }}">
+                                <i class="bi bi-images me-1"></i> Gallery
+                            </a>
+                        </li>
                         @if(Auth::user()->role === 'admin')
                             <li class="nav-item">
                                 <a class="nav-link text-warning {{ request()->routeIs('admin.*') ? 'active fw-bold text-white' : '' }}" href="{{ route('admin.index') }}">
@@ -75,6 +82,12 @@
                                 </a>
                             </li>
                         @endif
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('gallery.*') ? 'active fw-bold' : '' }}" href="{{ route('gallery.index') }}">
+                                <i class="bi bi-images me-1"></i> Gallery
+                            </a>
+                        </li>
                     @endauth
                 </ul>
                 <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
@@ -144,6 +157,13 @@
                 </div>
             @endif
 
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
@@ -164,6 +184,8 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Lightbox2 JS (includes jQuery) -->
+    <script src="{{ asset('lightbox2/dist/js/lightbox-plus-jquery.min.js') }}"></script>
     @yield('scripts')
 </body>
 </html>
