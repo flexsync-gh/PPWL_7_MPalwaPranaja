@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Category;
 use App\Models\Account;
-use App\Models\User;
+use App\Models\Category;
 use App\Models\Transaction;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,7 +14,9 @@ class TransactionCrudTest extends TestCase
     use RefreshDatabase;
 
     protected $user;
+
     protected $account;
+
     protected $category;
 
     protected function setUp(): void
@@ -25,19 +27,19 @@ class TransactionCrudTest extends TestCase
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
             'phonenumber' => '08123456789',
-            'role' => 'admin'
+            'role' => 'admin',
         ]);
         $this->actingAs($this->user);
         $this->account = Account::create([
             'userid' => $this->user->id,
             'name' => 'BCA',
             'type' => 'Bank',
-            'balance' => 5000000
+            'balance' => 5000000,
         ]);
         $this->category = Category::create([
             'userid' => $this->user->id,
             'name' => 'Makanan',
-            'type' => 'Expense'
+            'type' => 'Expense',
         ]);
     }
 
@@ -64,7 +66,7 @@ class TransactionCrudTest extends TestCase
             'amount' => 55000,
             'description' => 'Test Transaksi Otomatis',
             'type' => 'Expense',
-            'transaction_date' => '2026-09-28'
+            'transaction_date' => '2026-09-28',
         ]);
         $postRes->assertRedirect('/transactions');
         $postRes->assertSessionHas('pesan', 'Data Transaksi Berhasil Disimpan');
@@ -73,19 +75,19 @@ class TransactionCrudTest extends TestCase
         $this->assertNotNull($trx);
 
         // 2. Edit page
-        $editRes = $this->get('/transactions/' . $trx->id . '/edit');
+        $editRes = $this->get('/transactions/'.$trx->id.'/edit');
         $editRes->assertStatus(200);
         $editRes->assertSee('Edit Transaksi');
         $editRes->assertSee('Test Transaksi Otomatis');
 
         // 3. Update with flash message (Tugas 1)
-        $putRes = $this->put('/transactions/' . $trx->id, [
+        $putRes = $this->put('/transactions/'.$trx->id, [
             'categoryid' => $cat->id,
             'accountid' => $acc->id,
             'amount' => 77000,
             'description' => 'Test Transaksi Otomatis Terupdate',
             'type' => 'Expense',
-            'transaction_date' => '2026-09-28'
+            'transaction_date' => '2026-09-28',
         ]);
         $putRes->assertRedirect('/transactions');
         $putRes->assertSessionHas('pesan', 'Data Transaksi Berhasil Diupdate');
@@ -95,7 +97,7 @@ class TransactionCrudTest extends TestCase
         $this->assertEquals(77000, $trx->amount);
 
         // 4. Delete with flash message (Tugas 1)
-        $delRes = $this->delete('/transactions/' . $trx->id);
+        $delRes = $this->delete('/transactions/'.$trx->id);
         $delRes->assertRedirect('/transactions');
         $delRes->assertSessionHas('pesan', 'Data Transaksi Berhasil Dihapus');
 
@@ -111,7 +113,7 @@ class TransactionCrudTest extends TestCase
             'accountid',
             'type',
             'amount',
-            'description'
+            'description',
         ]);
 
         $errors = session('errors')->getMessages();
@@ -128,9 +130,9 @@ class TransactionCrudTest extends TestCase
                 'accountid' => $this->account->id,
                 'categoryid' => $this->category->id,
                 'amount' => 10000 * $i,
-                'description' => 'Transaksi Unik ' . $i,
+                'description' => 'Transaksi Unik '.$i,
                 'type' => 'Expense',
-                'transaction_date' => '2026-10-01'
+                'transaction_date' => '2026-10-01',
             ]);
         }
 

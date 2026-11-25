@@ -1,0 +1,360 @@
+:root {
+    --primary: #5b3be0;
+    --secondary: #8c62ff;
+    --accent: #ffb02e;
+    --background: #f7f4ff;
+    --surface: #ffffff;
+    --text: #17152b;
+    --muted: #64748b;
+    --success: #14a46c;
+    --danger: #dc3545;
+    --warning: #ff9f43;
+    --line: rgba(91, 59, 224, 0.14);
+}
+
+body.app-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(140, 98, 255, 0.16), transparent 32rem),
+        linear-gradient(135deg, #f7f4ff 0%, #ffffff 52%, #eef0ff 100%);
+}
+
+.main-content {
+    flex: 1;
+    padding: 28px 0;
+}
+
+.app-navbar {
+    background: linear-gradient(135deg, #1e1b4b 0%, var(--primary) 58%, var(--secondary) 100%);
+    box-shadow: 0 10px 26px rgba(45, 32, 101, 0.16);
+}
+
+.app-navbar .navbar-brand {
+    font-weight: 800;
+    letter-spacing: -0.4px;
+    color: #ffffff;
+}
+
+.app-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.84);
+    font-weight: 600;
+    font-size: 0.92rem;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.app-navbar .nav-link.active,
+.app-navbar .nav-link:hover {
+    color: #ffffff;
+    opacity: 1;
+}
+
+.app-theme-toggle {
+    width: 64px;
+    height: 32px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: rgba(255, 255, 255, 0.9);
+    cursor: pointer;
+}
+
+.app-theme-toggle .toggle-icon {
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.app-theme-toggle::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffd76a, #ff9f43);
+    box-shadow: 0 3px 8px rgba(255, 159, 67, 0.35);
+    transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.page-title {
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.card,
+.app-card {
+    border-radius: 16px;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 28px rgba(45, 32, 101, 0.06);
+}
+
+.card-header {
+    border-bottom: 1px solid var(--line);
+    border-top-left-radius: 16px !important;
+    border-top-right-radius: 16px !important;
+}
+
+.summary-card {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    color: #ffffff;
+    box-shadow: 0 14px 30px rgba(45, 32, 101, 0.12);
+}
+
+.summary-income {
+    background: linear-gradient(135deg, #0b7d53, #14a46c);
+}
+
+.summary-expense {
+    background: linear-gradient(135deg, #b51f32, #dc3545);
+}
+
+.summary-balance {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.summary-budget {
+    background: linear-gradient(135deg, #0f766e, #14b8a6);
+}
+
+.summary-savings {
+    background: linear-gradient(135deg, #4e31c9, #7c55ef);
+}
+
+.summary-warning {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+}
+
+.btn-primary {
+    border-color: var(--primary);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    border-color: #4e31c9;
+    background: linear-gradient(135deg, #4e31c9, #7c55ef);
+}
+
+.badge-soft-income {
+    color: #087a4c;
+    background: #dff8ed;
+}
+
+.badge-soft-expense {
+    color: #a4152b;
+    background: #ffe4e8;
+}
+
+.account-type-badge {
+    min-width: 78px;
+    padding: 0.42rem 0.72rem;
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.account-type-cash {
+    color: #087a4c;
+    background: #dff8ed;
+}
+
+.account-type-bank {
+    color: #23418f;
+    background: #e3eaff;
+}
+
+.account-type-ewallet {
+    color: #8a4d00;
+    background: #fff0cf;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.status-safe {
+    color: #087a4c;
+    background: #dff8ed;
+    border-color: rgba(20, 164, 108, 0.22);
+}
+
+.status-warning {
+    color: #8a4d00;
+    background: #fff0cf;
+    border-color: rgba(255, 159, 67, 0.28);
+}
+
+.status-over {
+    color: #a4152b;
+    background: #ffe4e8;
+    border-color: rgba(220, 53, 69, 0.24);
+}
+
+.progress {
+    height: 0.75rem;
+    border-radius: 999px;
+    background: rgba(100, 116, 139, 0.16);
+    overflow: hidden;
+}
+
+.progress-bar {
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+}
+
+.progress-bar.status-safe {
+    background: linear-gradient(135deg, var(--success), #3fd28d);
+}
+
+.progress-bar.status-warning {
+    background: linear-gradient(135deg, var(--warning), #ffc15c);
+}
+
+.progress-bar.status-over {
+    background: linear-gradient(135deg, var(--danger), #ff7b7b);
+}
+
+.transaction-description mark {
+    padding: 0 3px;
+    border-radius: 4px;
+    background: #fff1b8;
+    color: #17152b;
+}
+
+.empty-state {
+    padding: 44px 18px;
+    text-align: center;
+    color: var(--muted);
+}
+
+.app-footer {
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 16px 0;
+    margin-top: auto;
+}
+
+/* Dark Mode Support (from Finote) */
+body.app-body.dark-mode {
+    color: #f1f5f9;
+    background:
+        radial-gradient(circle at top left, rgba(91, 59, 224, 0.24), transparent 30rem),
+        radial-gradient(circle at bottom right, rgba(140, 98, 255, 0.18), transparent 27rem),
+        linear-gradient(135deg, #0f172a 0%, #16142b 55%, #0b0d17 100%);
+}
+
+body.app-body.dark-mode .app-navbar {
+    background: linear-gradient(135deg, #111827, #25204a);
+}
+
+body.app-body.dark-mode .app-theme-toggle::after {
+    transform: translateX(32px);
+    background: linear-gradient(135deg, #d9dcff, #8c62ff);
+    box-shadow: 0 3px 10px rgba(140, 98, 255, 0.36);
+}
+
+body.app-body.dark-mode .card,
+body.app-body.dark-mode .app-card,
+body.app-body.dark-mode .card-header,
+body.app-body.dark-mode .card-footer,
+body.app-body.dark-mode .list-group-item,
+body.app-body.dark-mode .app-footer {
+    background-color: #1a1830 !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.app-body.dark-mode .bg-white,
+body.app-body.dark-mode .bg-light {
+    background-color: #221f3d !important;
+    color: #f1f5f9 !important;
+}
+
+body.app-body.dark-mode .text-dark {
+    color: #f8fafc !important;
+}
+
+body.app-body.dark-mode .text-muted,
+body.app-body.dark-mode .form-text {
+    color: #a5b4fc !important;
+}
+
+body.app-body.dark-mode .table {
+    --bs-table-color: #f1f5f9;
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: rgba(140, 98, 255, 0.12);
+    --bs-table-hover-color: #ffffff;
+    --bs-table-border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.app-body.dark-mode .table thead th,
+body.app-body.dark-mode .table-light {
+    --bs-table-bg: rgba(255, 255, 255, 0.05);
+    --bs-table-color: #e2e8f0;
+    color: #e2e8f0;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+body.app-body.dark-mode .form-control,
+body.app-body.dark-mode .form-select,
+body.app-body.dark-mode .input-group-text {
+    background-color: #24203b;
+    border-color: #3b3561;
+    color: #f8fafc;
+}
+
+body.app-body.dark-mode .form-control::placeholder {
+    color: #94a3b8;
+}
+
+body.app-body.dark-mode .dropdown-menu {
+    background-color: #1e1b38;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+body.app-body.dark-mode .dropdown-item {
+    color: #e2e8f0;
+}
+
+body.app-body.dark-mode .dropdown-item:hover {
+    background-color: rgba(140, 98, 255, 0.2);
+}
+
+body.app-body.dark-mode .status-safe {
+    color: #8bf1c2;
+    background: rgba(20, 164, 108, 0.18);
+    border-color: rgba(20, 164, 108, 0.32);
+}
+
+body.app-body.dark-mode .status-warning {
+    color: #ffd28a;
+    background: rgba(255, 159, 67, 0.18);
+    border-color: rgba(255, 159, 67, 0.34);
+}
+
+body.app-body.dark-mode .status-over {
+    color: #ffabb5;
+    background: rgba(220, 53, 69, 0.18);
+    border-color: rgba(220, 53, 69, 0.35);
+}

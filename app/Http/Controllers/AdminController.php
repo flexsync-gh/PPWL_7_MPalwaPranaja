@@ -53,4 +53,28 @@ class AdminController extends Controller
 
         return back()->with('pesan', "Role user {$user->name} berhasil diubah menjadi {$user->role}!");
     }
+
+    /**
+     * Tandai semua notifikasi admin yang belum dibaca sebagai sudah dibaca.
+     */
+    public function markAllNotificationsRead(Request $request)
+    {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return back()->with('pesan', 'Semua notifikasi telah ditandai sudah dibaca.');
+    }
+
+    /**
+     * Tandai satu notifikasi admin sebagai sudah dibaca.
+     */
+    public function markNotificationRead(Request $request, string $id)
+    {
+        $notification = $request->user()->notifications()->where('id', $id)->first();
+
+        if ($notification) {
+            $notification->markAsRead();
+        }
+
+        return back();
+    }
 }

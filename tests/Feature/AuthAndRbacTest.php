@@ -22,13 +22,17 @@ class AuthAndRbacTest extends TestCase
     }
 
     /**
-     * Uji Guest dialihkan ke login saat akses route terproteksi auth (MIDDLEWARE_RBAC.pdf Langkah 3).
+     * Uji Guest dialihkan ke login saat akses route terproteksi auth.
      */
     public function test_guest_redirected_to_login(): void
     {
         $this->get('/dashboard')->assertRedirect('/login');
         $this->get('/profile')->assertRedirect('/login');
         $this->get('/transactions')->assertRedirect('/login');
+        $this->get('/accounts')->assertRedirect('/login');
+        $this->get('/categories')->assertRedirect('/login');
+        $this->get('/budgets')->assertRedirect('/login');
+        $this->get('/savings')->assertRedirect('/login');
         $this->get('/admin')->assertRedirect('/login');
     }
 
@@ -47,15 +51,15 @@ class AuthAndRbacTest extends TestCase
     }
 
     /**
-     * Uji Registrasi Pengguna Baru dan default role adalah 'user' (MIDDLEWARE_RBAC.pdf & AUTH_2.pdf).
+     * Uji Registrasi Pengguna Baru: default role 'user' dan otomatis mendapat akun & kategori awal.
      */
     public function test_user_registration_and_default_role(): void
     {
         $response = $this->post('/register', [
-            'name'                  => 'Mahasiswa Baru',
-            'email'                 => 'mhs@example.com',
-            'phonenumber'           => '081234567890',
-            'password'              => 'secret123',
+            'name' => 'Mahasiswa Baru',
+            'email' => 'mhs@example.com',
+            'phonenumber' => '081234567890',
+            'password' => 'secret123',
             'password_confirmation' => 'secret123',
         ]);
 
@@ -65,6 +69,8 @@ class AuthAndRbacTest extends TestCase
         $user = User::where('email', 'mhs@example.com')->first();
         $this->assertNotNull($user);
         $this->assertEquals('user', $user->role);
+        $this->assertTrue($user->accounts()->exists());
+        $this->assertTrue($user->categories()->exists());
     }
 
     /**
@@ -73,15 +79,15 @@ class AuthAndRbacTest extends TestCase
     public function test_user_login_validation(): void
     {
         $user = User::create([
-            'name'     => 'Testing User',
-            'email'    => 'testlogin@example.com',
+            'name' => 'Testing User',
+            'email' => 'testlogin@example.com',
             'password' => Hash::make('password123'),
-            'role'     => 'user',
+            'role' => 'user',
         ]);
 
         // Login gagal (password salah)
         $failRes = $this->post('/login', [
-            'email'    => 'testlogin@example.com',
+            'email' => 'testlogin@example.com',
             'password' => 'wrongpassword',
         ]);
         $failRes->assertSessionHasErrors('email');
@@ -89,7 +95,7 @@ class AuthAndRbacTest extends TestCase
 
         // Login berhasil
         $successRes = $this->post('/login', [
-            'email'    => 'testlogin@example.com',
+            'email' => 'testlogin@example.com',
             'password' => 'password123',
         ]);
         $successRes->assertRedirect('/dashboard');
@@ -97,45 +103,49 @@ class AuthAndRbacTest extends TestCase
     }
 
     /**
-     * Uji Akses User Biasa: Bisa akses dashboard, profile, transactions tapi DITOLAK dari /admin (MIDDLEWARE_RBAC.pdf).
+     * Uji Akses User Biasa: Dapat mengakses & mengelola semua fitur keuangan pribadi, tapi DITOLAK dari /admin.
      */
     public function test_regular_user_access_and_rbac_restrictions(): void
     {
         $regularUser = User::create([
-            'name'     => 'User Biasa',
-            'email'    => 'regular@example.com',
+            'name' => 'User Biasa',
+            'email' => 'regular@example.com',
             'password' => Hash::make('password123'),
-            'role'     => 'user',
+            'role' => 'user',
         ]);
 
         $this->actingAs($regularUser);
 
-        // Halaman yang BOLEH diakses
+        // Halaman yang BOLEH diakses oleh User Biasa (Keuangan pribadi unlocked)
         $this->get('/dashboard')->assertStatus(200)->assertSee('Selamat Datang');
         $this->get('/profile')->assertStatus(200)->assertSee('Profil Pengguna');
-        $this->get('/transactions')->assertStatus(200);
+        $this->get('/transactions')->assertStatus(200)->assertSee('Tambah Transaksi');
+        $this->get('/transactions/create')->assertStatus(200)->assertSee('Tambah Transaksi');
+        $this->get('/accounts')->assertStatus(200)->assertSee('Akun Keuangan');
+        $this->get('/categories')->assertStatus(200)->assertSee('Kategori Transaksi');
+        $this->get('/budgets')->assertStatus(200)->assertSee('Budget Bulanan');
+        $this->get('/savings')->assertStatus(200)->assertSee('Target Tabungan');
 
         // Halaman yang DITOLAK oleh middleware isAdmin
         $adminRes = $this->get('/admin');
         $adminRes->assertRedirect('/');
         $adminRes->assertSessionHas('error');
 
-        // Fitur tambah transaksi juga ditolak untuk user biasa
-        $createRes = $this->get('/transactions/create');
-        $createRes->assertRedirect('/');
-        $createRes->assertSessionHas('error');
+        $roleRes = $this->post("/admin/users/{$regularUser->id}/role", ['role' => 'admin']);
+        $roleRes->assertRedirect('/');
+        $roleRes->assertSessionHas('error');
     }
 
     /**
-     * Uji Akses Admin: Bisa akses /admin dan fitur create/edit/delete (MIDDLEWARE_RBAC.pdf).
+     * Uji Akses Admin: Bisa akses /admin dan seluruh fitur keuangan.
      */
     public function test_admin_access(): void
     {
         $adminUser = User::create([
-            'name'     => 'Super Admin',
-            'email'    => 'superadmin@example.com',
+            'name' => 'Super Admin',
+            'email' => 'superadmin@example.com',
             'password' => Hash::make('password123'),
-            'role'     => 'admin',
+            'role' => 'admin',
         ]);
 
         $this->actingAs($adminUser);
@@ -157,10 +167,10 @@ class AuthAndRbacTest extends TestCase
     public function test_user_can_logout(): void
     {
         $user = User::create([
-            'name'     => 'User Logout',
-            'email'    => 'logout@example.com',
+            'name' => 'User Logout',
+            'email' => 'logout@example.com',
             'password' => Hash::make('password123'),
-            'role'     => 'user',
+            'role' => 'user',
         ]);
 
         $this->actingAs($user);

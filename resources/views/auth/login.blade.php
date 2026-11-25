@@ -73,6 +73,19 @@
                         </button>
                     </div>
 
+                    <div class="d-flex align-items-center my-3">
+                        <hr class="flex-grow-1">
+                        <span class="px-2 small text-muted">atau</span>
+                        <hr class="flex-grow-1">
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <a href="{{ route('auth.google') }}" class="btn btn-outline-danger btn-lg fs-6 fw-semibold d-flex align-items-center justify-content-center gap-2">
+                            <i class="bi bi-google"></i>
+                            <span>Masuk dengan Google (@gmail.com)</span>
+                        </a>
+                    </div>
+
                     <div class="text-center">
                         <p class="small text-muted mb-0">
                             Belum memiliki akun? 

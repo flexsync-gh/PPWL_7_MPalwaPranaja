@@ -11,6 +11,7 @@ use Tests\TestCase;
 class GalleryTest extends TestCase
 {
     use RefreshDatabase;
+
     public function test_gallery_index_screen_can_be_rendered(): void
     {
         $response = $this->get('/gallery');
@@ -47,7 +48,7 @@ class GalleryTest extends TestCase
 
         $post = Post::where('title', 'Pemandangan Indah')->first();
         $this->assertNotNull($post->picture);
-        Storage::disk('public')->assertExists('posts_image/' . $post->picture);
+        Storage::disk('public')->assertExists('posts_image/'.$post->picture);
     }
 
     public function test_can_edit_and_update_gallery_post(): void
@@ -81,7 +82,7 @@ class GalleryTest extends TestCase
         $this->assertEquals('Judul Baru', $post->title);
         $this->assertEquals('Deskripsi Baru', $post->description);
         Storage::disk('public')->assertMissing('posts_image/old_file.jpg');
-        Storage::disk('public')->assertExists('posts_image/' . $post->picture);
+        Storage::disk('public')->assertExists('posts_image/'.$post->picture);
     }
 
     public function test_can_delete_gallery_post(): void

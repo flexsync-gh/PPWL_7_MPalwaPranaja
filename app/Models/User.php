@@ -7,10 +7,11 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'phonenumber', 'profile_photo', 'bio', 'theme_color'])]
+#[Fillable(['name', 'email', 'google_id', 'password', 'role', 'phonenumber', 'profile_photo', 'avatar', 'bio', 'theme_color'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -34,10 +35,12 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'google_id',
         'password',
         'role',
         'phonenumber',
         'profile_photo',
+        'avatar',
         'bio',
         'theme_color',
     ];
@@ -55,16 +58,86 @@ class User extends Authenticatable
         ];
     }
 
+    public function accounts(): HasMany
+    {
+        return $this->hasMany(Account::class, 'userid');
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(Category::class, 'userid');
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class, 'userid');
+    }
+
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(Budget::class, 'userid');
+    }
+
+    public function savingGoals(): HasMany
+    {
+        return $this->hasMany(SavingGoal::class, 'userid');
+    }
+
+    public function savingTransactions(): HasMany
+    {
+        return $this->hasMany(SavingTransaction::class, 'userid');
+    }
+
+    /**
+     * Buat akun dan kategori bawaan untuk pengguna baru agar langsung bisa mencatat transaksi dan budget.
+     */
+    public function ensureStarterData(): void
+    {
+        if (! $this->accounts()->exists()) {
+            $this->accounts()->create([
+                'name' => 'Dompet',
+                'type' => 'cash',
+                'balance' => 0,
+            ]);
+        }
+
+        if (! $this->categories()->exists()) {
+            $starterCategories = [
+                ['name' => 'Gaji', 'type' => 'income'],
+                ['name' => 'Pemasukan Lainnya', 'type' => 'income'],
+                ['name' => 'Makanan & Minuman', 'type' => 'expense'],
+                ['name' => 'Transportasi', 'type' => 'expense'],
+                ['name' => 'Pengeluaran Umum', 'type' => 'expense'],
+            ];
+
+            foreach ($starterCategories as $category) {
+                $this->categories()->create($category);
+            }
+        }
+    }
+
+    /**
+     * Periksa apakah pengguna memiliki role admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
     /**
      * Dapatkan URL publik foto profil pengguna jika tersedia.
      */
     public function getProfilePhotoUrlAttribute(): ?string
     {
-        if (! $this->profile_photo) {
-            return null;
+        if ($this->profile_photo) {
+            return asset('storage/'.ltrim($this->profile_photo, '/'));
         }
 
-        return asset('storage/'.ltrim($this->profile_photo, '/'));
+        if ($this->avatar) {
+            return $this->avatar;
+        }
+
+        return null;
     }
 
     /**
